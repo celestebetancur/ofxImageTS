@@ -15,6 +15,65 @@ ofTexture ofxImageTS::alterColorRGB(ofImage image,int R, int G, int B){
     return texture;
 }
 
+ofTexture ofxImageTS::alterColorRGB(ofImage image, float R, float G, float B){
+    
+    ofTexture texture;
+    ofPixels copy;
+    copy.allocate(image.getWidth(), image.getHeight(), OF_PIXELS_RGB);
+    texture.allocate(image);
+    for(int i = 0; i < image.getPixels().size()-3; i += 3){
+        copy[i] = R * image.getPixels()[i];
+        copy[i+1] = G * image.getPixels()[i+1];
+        copy[i+2] = B * image.getPixels()[i+2];
+    }
+    texture.loadData(copy);
+    return texture;
+}
+ofTexture ofxImageTS::alterColorR(ofImage image,float R){
+    
+    ofTexture texture;
+    ofPixels copy;
+    copy.allocate(image.getWidth(), image.getHeight(), OF_PIXELS_RGB);
+    texture.allocate(image);
+    for(int i = 0; i < image.getPixels().size()-3; i += 3){
+        copy[i] = image.getPixels()[i] * R;
+        copy[i+1] = 0;
+        copy[i+2] = 0;
+    }
+    texture.loadData(copy);
+    return texture;
+}
+
+ofTexture ofxImageTS::alterColorG(ofImage image,float G){
+    
+    ofTexture texture;
+    ofPixels copy;
+    copy.allocate(image.getWidth(), image.getHeight(), OF_PIXELS_RGB);
+    texture.allocate(image);
+    for(int i = 0; i < image.getPixels().size()-3; i += 3){
+        copy[i] = 0;
+        copy[i+1] = image.getPixels()[i] * G;
+        copy[i+2] = 0;
+    }
+    texture.loadData(copy);
+    return texture;
+}
+
+ofTexture ofxImageTS::alterColorB(ofImage image,float B){
+    
+    ofTexture texture;
+    ofPixels copy;
+    copy.allocate(image.getWidth(), image.getHeight(), OF_PIXELS_RGB);
+    texture.allocate(image);
+    for(int i = 0; i < image.getPixels().size()-3; i += 3){
+        copy[i] = 0;
+        copy[i+1] = 0;
+        copy[i+2] = image.getPixels()[i] * B;
+    }
+    texture.loadData(copy);
+    return texture;
+}
+
 ofTexture ofxImageTS::greyScale(ofImage image) {
     
     int avg;
@@ -157,6 +216,124 @@ ofTexture ofxImageTS::noise(ofImage image, float mix) {
     return texture;
 }
 
+ofTexture ofxImageTS::sinusoidal(ofImage image){
+    
+    ofTexture texture;
+    ofPixels copy;
+    copy.allocate(image.getWidth(), image.getHeight(), OF_PIXELS_RGB);
+    texture.allocate(image);
+    float Sin;
+    for(int i = 0; i < image.getPixels().size()-3; i += 3){
+        Sin = (sin(i) + 1)/2.0f;
+        copy[i] = Sin * image.getPixels()[i];
+        copy[i+1] = Sin *  image.getPixels()[i+1];
+        copy[i+2] = Sin *  image.getPixels()[i+2];
+    }
+    texture.loadData(copy);
+    return texture;
+}
+
+ofTexture ofxImageTS::tanR(ofImage image){
+    
+    ofTexture texture;
+    ofPixels copy;
+    copy.allocate(image.getWidth(), image.getHeight(), OF_PIXELS_RGB);
+    texture.allocate(image);
+    float Tan;
+    for(int i = 0; i < image.getPixels().size()-3; i += 3){
+        Tan = tan(i);
+        copy[i] = Tan * image.getPixels()[i];
+        copy[i+1] = image.getPixels()[i+1];
+        copy[i+2] = image.getPixels()[i+2];
+    }
+    texture.loadData(copy);
+    return texture;
+}
+
+ofTexture ofxImageTS::tanG(ofImage image){
+    
+    ofTexture texture;
+    ofPixels copy;
+    copy.allocate(image.getWidth(), image.getHeight(), OF_PIXELS_RGB);
+    texture.allocate(image);
+    float Tan;
+    for(int i = 0; i < image.getPixels().size()-3; i += 3){
+        Tan = tan(i);
+        copy[i] = image.getPixels()[i];
+        copy[i+1] = Tan * image.getPixels()[i+1];
+        copy[i+2] = image.getPixels()[i+2];
+    }
+    texture.loadData(copy);
+    return texture;
+}
+
+ofTexture ofxImageTS::tanB(ofImage image){
+    
+    ofTexture texture;
+    ofPixels copy;
+    copy.allocate(image.getWidth(), image.getHeight(), OF_PIXELS_RGB);
+    texture.allocate(image);
+    float Tan;
+    for(int i = 0; i < image.getPixels().size()-3; i += 3){
+        Tan = tan(i);
+        copy[i] =  image.getPixels()[i];
+        copy[i+1] = image.getPixels()[i+1];
+        copy[i+2] = Tan * image.getPixels()[i+2];
+    }
+    texture.loadData(copy);
+    return texture;
+}
+
+ofTexture ofxImageTS::tanRB(ofImage image){
+    
+    ofTexture texture;
+    ofPixels copy;
+    copy.allocate(image.getWidth(), image.getHeight(), OF_PIXELS_RGB);
+    texture.allocate(image);
+    float Tan;
+    for(int i = 0; i < image.getPixels().size()-3; i += 3){
+        Tan = tan(i);
+        copy[i] =  Tan * image.getPixels()[i];
+        copy[i+1] = image.getPixels()[i+1];
+        copy[i+2] = Tan * image.getPixels()[i+2];
+    }
+    texture.loadData(copy);
+    return texture;
+}
+
+ofTexture ofxImageTS::tanRG(ofImage image){
+    
+    ofTexture texture;
+    ofPixels copy;
+    copy.allocate(image.getWidth(), image.getHeight(), OF_PIXELS_RGB);
+    texture.allocate(image);
+    float Tan;
+    for(int i = 0; i < image.getPixels().size()-3; i += 3){
+        Tan = tan(i);
+        copy[i] = Tan * image.getPixels()[i];
+        copy[i+1] = Tan * image.getPixels()[i+1];
+        copy[i+2] =  image.getPixels()[i+2];
+    }
+    texture.loadData(copy);
+    return texture;
+}
+
+ofTexture ofxImageTS::tanGB(ofImage image){
+    
+    ofTexture texture;
+    ofPixels copy;
+    copy.allocate(image.getWidth(), image.getHeight(), OF_PIXELS_RGB);
+    texture.allocate(image);
+    float Tan;
+    for(int i = 0; i < image.getPixels().size()-3; i += 3){
+        Tan = tan(i);
+        copy[i] =  image.getPixels()[i];
+        copy[i+1] = Tan * image.getPixels()[i+1];
+        copy[i+2] = Tan * image.getPixels()[i+2];
+    }
+    texture.loadData(copy);
+    return texture;
+}
 //--------------------------------------------------------------
 void ofxImageTS::setup(){
 
