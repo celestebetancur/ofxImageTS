@@ -334,6 +334,114 @@ ofTexture ofxImageTS::tanGB(ofImage image){
     texture.loadData(copy);
     return texture;
 }
+
+//-------------------------------ofPixels-------------------------------------
+
+ofPixels ofxImageTS::alterColorRGB(ofPixels pixels,int R, int G, int B){
+
+    pixels.allocate(pixels.getWidth(), pixels.getHeight(), OF_PIXELS_RGB);
+    ofPixels copy;
+    copy = pixels;
+    for(int i = 0; i < pixels.size()-3; i += 3){
+        copy[i] = R - pixels[i];
+        copy[i+1] = G - pixels[i+1];
+        copy[i+2] = B - pixels[i+2];
+    }
+    return copy;
+}
+
+ofPixels ofxImageTS::alterColorRGB(ofPixels pixels,float R, float G, float B){
+    
+    pixels.allocate(pixels.getWidth(), pixels.getHeight(), OF_PIXELS_RGB);
+    ofPixels copy;
+    copy = pixels;
+    for(int i = 0; i < pixels.size()-3; i += 3){
+        copy[i] = R * pixels[i];
+        copy[i+1] = G * pixels[i+1];
+        copy[i+2] = B * pixels[i+2];
+    }
+    return copy;
+}
+
+ofPixels ofxImageTS::invertRB(ofPixels pixels){
+    
+    pixels.allocate(pixels.getWidth(), pixels.getHeight(), OF_PIXELS_RGBA);
+    ofPixels copy;
+    copy = pixels;
+    for(int i = 0; i < pixels.size()-3; i += 4){
+        copy[i] = pixels[i+2];
+        copy[i+1] = pixels[i+1];
+        copy[i+2] = pixels[i];
+        copy[i+3] = pixels[i+3];
+    }
+    return copy;
+}
+
+void ofxImageTS::pixelate(ofPixels pixels, int pixelRatio) {
+    ofPixels R,G,B, copy;
+    if(pixels.getWidth() < pixels.getHeight())
+        pixels.resize(640,480);
+    if(pixels.getWidth() > pixels.getHeight())
+        pixels.resize(480,640);
+    copy.allocate(pixels.getWidth(), pixels.getHeight(), OF_PIXELS_RGB);
+    copy = pixels;
+    R = copy.getChannel(0);
+    G = copy.getChannel(1);
+    B = copy.getChannel(2);
+    int camWidth = pixels.getWidth();
+    int camHeight = pixels.getHeight();
+    int boxWidth = pixels.getWidth()/(pow(2,pixelRatio)*10);
+    int boxHeight = pixels.getHeight()/(pow(2,pixelRatio)*10);
+    
+    float tot = boxWidth*boxHeight;
+    for (int x = 0; x < camWidth; x += boxWidth) {
+        for (int y = 0; y < camHeight; y += boxHeight) {
+            float Red = 0, Green = 0, Blue = 0;
+            for (int k = 0; k < boxWidth; k++) {
+                for (int l = 0; l < boxHeight; l++) {
+                    int index = (x + k) + (y + l) * camWidth;
+                    Red += R[index];
+                    Green += G[index];
+                    Blue += B[index];
+                }
+                ofSetColor(Red/tot,Green/tot,Blue/tot);
+                ofFill();
+                ofDrawRectangle(x, y, boxWidth, boxHeight);
+            }
+        }
+    }
+}
+
+void ofxImageTS::pixelate(ofVideoGrabber video, int pixelRatio) {
+    ofPixels R,G,B, copy;
+    copy.allocate(video.getWidth(), video.getHeight(), OF_PIXELS_RGB);
+    copy = video.getPixels();
+    R = copy.getChannel(0);
+    G = copy.getChannel(1);
+    B = copy.getChannel(2);
+    int camWidth = video.getWidth();
+    int camHeight = video.getHeight();
+    int boxWidth = video.getWidth()/(pow(2,pixelRatio)*10);
+    int boxHeight = video.getHeight()/(pow(2,pixelRatio)*10);
+    
+    float tot = boxWidth*boxHeight;
+    for (int x = 0; x < camWidth; x += boxWidth) {
+        for (int y = 0; y < camHeight; y += boxHeight) {
+            float Red = 0, Green = 0, Blue = 0;
+            for (int k = 0; k < boxWidth; k++) {
+                for (int l = 0; l < boxHeight; l++) {
+                    int index = (x + k) + (y + l) * camWidth;
+                    Red += R[index];
+                    Green += G[index];
+                    Blue += B[index];
+                }
+                ofSetColor(Red/tot,Green/tot,Blue/tot);
+                ofFill();
+                ofDrawRectangle(x, y, boxWidth, boxHeight);
+            }
+        }
+    }
+}
 //--------------------------------------------------------------
 void ofxImageTS::setup(){
 

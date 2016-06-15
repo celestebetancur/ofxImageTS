@@ -43,4 +43,15 @@ class ofxImageTS : public ofBaseApp{
         ofTexture tanRB(ofImage image);
         ofTexture tanRG(ofImage image);
         ofTexture tanGB(ofImage image);
+    
+    //-----------------ofPixels (ofPixels)----------------------
+    
+        ofPixels alterColorRGB(ofPixels pixels, int R, int G, int B);
+        ofPixels alterColorRGB(ofPixels image, float R, float G, float B);
+    
+    
+        ofPixels invertRB(ofPixels image);
+        void pixelate(ofPixels pixels, int pixelRatio);
+        void pixelate(ofVideoGrabber video, int pixelRatio);
+    
 };
