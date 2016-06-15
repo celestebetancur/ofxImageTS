@@ -51,7 +51,10 @@ class ofxImageTS : public ofBaseApp{
     
     
         ofPixels invertRB(ofPixels image);
+    
         void pixelate(ofPixels pixels, int pixelRatio);
         void pixelate(ofVideoGrabber video, int pixelRatio);
+        void pixelate(ofVideoPlayer video, int pixelRatio);
+        void pixelate(ofImage image, int pixelRatio);
     
 };
