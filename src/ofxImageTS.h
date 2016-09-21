@@ -7,7 +7,7 @@ class ofxImageTS : public ofBaseApp{
 	public:
 		void setup();
 		void update();
-		void draw();
+		void draw(ofPixels pixels,int ratio ,int x, int y, int width, int height, int form);
 
 		void keyPressed(int key);
 		void keyReleased(int key);
@@ -31,6 +31,7 @@ class ofxImageTS : public ofBaseApp{
         ofTexture greyScale(ofImage image);
         ofTexture whiteBlack(ofImage image);
         ofTexture blackWhite(ofImage image);
+        ofTexture dualist(ofImage image, ofColor base, ofColor top);
         ofTexture invert(ofImage image);
         ofTexture invertRB(ofImage image);
         ofTexture invertRG(ofImage image);
@@ -48,11 +49,18 @@ class ofxImageTS : public ofBaseApp{
     
         ofPixels alterColorRGB(ofPixels pixels, int R, int G, int B);
         ofPixels alterColorRGB(ofPixels image, float R, float G, float B);
-    
+        ofPixels spaceTime(ofPixels pixels);
     
         ofPixels invertRB(ofPixels image);
     
+        void pixSaturation(ofPixels pixels, int pixelRatio, float saturation);
+        void divider(ofTexture texture,float divW, float divH,float width, float height);
+        void divider(ofImage image,float divW, float divH, float width, float height);
+        void spaceTime(ofImage image, float depth, float density, float width, float height);
+        void spaceTime(ofTexture texture, float depth, float density, float width, float height);
         void pixelate(ofPixels pixels, int pixelRatio);
+        void pixelate(ofPixels pixels, int pixelRatio, int X, int Y, int W, int H, int form);
+        void pixelateInv(ofPixels pixels, int pixelRatio, int X, int Y, int W, int H);
         void pixelate(ofVideoGrabber video, int pixelRatio);
         void pixelate(ofVideoPlayer video, int pixelRatio);
         void pixelate(ofImage image, int pixelRatio);

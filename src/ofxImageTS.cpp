@@ -139,6 +139,29 @@ ofTexture ofxImageTS::blackWhite(ofImage image) {
     return texture;
 }
 
+ofTexture ofxImageTS::dualist(ofImage image, ofColor base, ofColor top) {
+    int avg;
+    ofTexture texture;
+    ofPixels copy;
+    copy.allocate(image.getWidth(), image.getHeight(), OF_PIXELS_RGB);
+    texture.allocate(image);
+    for(int i = 0; i < image.getPixels().size()-3; i += 3){
+        avg = (image.getPixels()[i] + image.getPixels()[i+1] + image.getPixels()[i+2])/3;
+        if(avg < 128) {
+            copy[i] = base.r;
+            copy[i+1] = base.g;
+            copy[i+2] = base.b;
+        }
+        else {
+            copy[i] = top.r;
+            copy[i+1] = top.g;
+            copy[i+2] = top.b;
+        }
+    }
+    texture.loadData(copy);
+    return texture;
+}
+
 ofTexture ofxImageTS::invert(ofImage image){
     
     ofTexture texture;
@@ -334,7 +357,46 @@ ofTexture ofxImageTS::tanGB(ofImage image){
     texture.loadData(copy);
     return texture;
 }
+void ofxImageTS::spaceTime(ofImage image, float depth, float density, float width, float height){
 
+    ofFbo buffer;
+    buffer.begin();
+    ofSetRectMode(OF_RECTMODE_CENTER);
+    for(float i = 0; i < depth; i += 1/density){
+        image.draw(width/2,height/2,width/i,height/i);
+    }
+    buffer.end();
+}
+void ofxImageTS::spaceTime(ofTexture texture, float depth, float density, float width, float height){
+    
+    ofFbo buffer;
+    buffer.begin();
+    ofSetRectMode(OF_RECTMODE_CENTER);
+    for(float i = 0; i < depth; i += 1/density){
+        texture.draw(width/2,height/2,width/i,height/i);
+    }
+    buffer.end();
+}
+void ofxImageTS::divider(ofImage image,float divW, float divH, float width, float height){
+    ofFbo buffer;
+    buffer.begin();
+    for(int i = 0; i < divW; i++) {
+        for(int j = 0; j < divH; j++) {
+            image.draw((width/divW) * i,(height/divH) * j,width/divW,height/divH);
+        }
+    }
+    buffer.end();
+}
+void ofxImageTS::divider(ofTexture texture,float divW, float divH, float width, float height){
+    ofFbo buffer;
+    buffer.begin();
+    for(int i = 0; i < divW; i++) {
+        for(int j = 0; j < divH; j++) {
+            texture.draw((width/divW) * i,(height/divH) * j,width/divW,height/divH);
+        }
+    }
+    buffer.end();
+}
 //-------------------------------ofPixels-------------------------------------
 
 ofPixels ofxImageTS::alterColorRGB(ofPixels pixels,int R, int G, int B){
@@ -377,8 +439,51 @@ ofPixels ofxImageTS::invertRB(ofPixels pixels){
     return copy;
 }
 
+void ofxImageTS::pixSaturation(ofPixels pixels, int pixelRatio, float saturation) {
+    if(pixelRatio > 4 || pixelRatio < 0) {
+        ofLogNotice("Pixel Ratio must be between 0 and 5");
+    }
+    else {
+        ofPixels R,G,B, copy;
+        if(pixels.getWidth() < pixels.getHeight())
+            pixels.resize(640,480);
+        if(pixels.getWidth() > pixels.getHeight())
+            pixels.resize(480,640);
+        copy.allocate(pixels.getWidth(), pixels.getHeight(), OF_PIXELS_RGB);
+        copy = pixels;
+        R = copy.getChannel(0);
+        G = copy.getChannel(1);
+        B = copy.getChannel(2);
+        int camWidth = pixels.getWidth();
+        int camHeight = pixels.getHeight();
+        int boxWidth = pixels.getWidth()/(pow(2,pixelRatio)*10);
+        int boxHeight = pixels.getHeight()/(pow(2,pixelRatio)*10);
+        
+        float tot = boxWidth*boxHeight;
+        for (int x = 0; x < camWidth; x += boxWidth) {
+            for (int y = 0; y < camHeight; y += boxHeight) {
+                float Red = 0, Green = 0, Blue = 0;
+                for (int k = 0; k < boxWidth; k++) {
+                    for (int l = 0; l < boxHeight; l++) {
+                        int index = (x + k) + (y + l) * camWidth;
+                        Red += R[index];
+                        Green += G[index];
+                        Blue += B[index];
+                    }
+                    ofColor color;
+                    color.set(Red/tot,Green/tot,Blue/tot);
+                    color.setSaturation(saturation);
+                    ofSetColor(color);
+                    ofFill();
+                    ofDrawRectangle(x, y, boxWidth, boxHeight);
+                }
+            }
+        }
+    }
+}
+
 void ofxImageTS::pixelate(ofPixels pixels, int pixelRatio) {
-    if(pixelRatio > 5 || pixelRatio < 0) {
+    if(pixelRatio > 4 || pixelRatio < 0) {
         ofLogNotice("Pixel Ratio must be between 0 and 5");
     }
     else {
@@ -417,6 +522,96 @@ void ofxImageTS::pixelate(ofPixels pixels, int pixelRatio) {
     }
 }
 
+void ofxImageTS::pixelate(ofPixels pixels, int pixelRatio, int X, int Y, int W, int H, int form) {
+    if(pixelRatio > 4 || pixelRatio < 0) {
+        ofLogNotice("Pixel Ratio must be between 0 and 5");
+    }
+    else {
+        ofPixels R,G,B, copy;
+        pixels.resize(W,H);
+        copy.allocate(pixels.getWidth(), pixels.getHeight(), OF_PIXELS_RGBA);
+        copy = pixels;
+        R = copy.getChannel(0);
+        G = copy.getChannel(1);
+        B = copy.getChannel(2);
+        int camWidth = pixels.getWidth();
+        int camHeight = pixels.getHeight();
+        int boxWidth = pixels.getWidth()/(pow(2,pixelRatio)*10);
+        int boxHeight = pixels.getHeight()/(pow(2,pixelRatio)*10);
+        
+        float tot = boxWidth*boxHeight;
+        for (int x = 0; x < camWidth; x += boxWidth) {
+            for (int y = 0; y < camHeight; y += boxHeight) {
+                float Red = 0, Green = 0, Blue = 0;
+                for (int k = 0; k < boxWidth; k++) {
+                    for (int l = 0; l < boxHeight; l++) {
+                        int index = (x + k) + (y + l) * camWidth;
+                        Red += R[index];
+                        Green += G[index];
+                        Blue += B[index];
+                    }
+                    ofSetColor(Red/tot,Green/tot,Blue/tot);
+                    ofFill();
+                    if(form == 1)
+                        ofDrawRectangle(x+X, y+Y, boxWidth, boxHeight);
+                    if(form == 2)
+                        ofDrawBox(x+X, y+Y, boxWidth, boxHeight);
+                    if(form == 3)
+                        ofDrawCircle(x+X, y+Y, boxWidth, boxHeight);
+                    if(form == 4)
+                        ofDrawTriangle(x+X, y+Y, X+x+boxHeight, y+Y, x+X, y+Y+boxWidth);
+                }
+            }
+        }
+    }
+}
+
+void ofxImageTS::pixelateInv(ofPixels pixels, int pixelRatio, int X, int Y, int W, int H) {
+    ofPixels R,G,B, Rc, Gc, Bc;
+    pixels.resize(W,H);
+    R = pixels.getChannel(0);
+    G = pixels.getChannel(1);
+    B = pixels.getChannel(2);
+    Rc = R;
+    Gc = G;
+    Bc = B;
+    int c = 0;
+    for(int i = R.size()-1; i > 0; i--){
+        Rc[c] = R[i];
+        Gc[c] = G[i];
+        Bc[c] = B[i];
+        c++;
+    }
+    if(pixelRatio > 4 || pixelRatio < 0) {
+        ofLogNotice("Pixel Ratio must be between 0 and 5");
+    }
+    else {
+        
+        int camWidth = pixels.getWidth();
+        int camHeight = pixels.getHeight();
+        int boxWidth = pixels.getWidth()/(pow(2,pixelRatio)*10);
+        int boxHeight = pixels.getHeight()/(pow(2,pixelRatio)*10);
+        
+        float tot = boxWidth*boxHeight;
+        for (int x = 0; x < camWidth; x += boxWidth) {
+            for (int y = 0; y < camHeight; y += boxHeight) {
+                float Red = 0, Green = 0, Blue = 0;
+                for (int k = 0; k < boxWidth; k++) {
+                    for (int l = 0; l < boxHeight; l++) {
+                        int index = (x + k) + (y + l) * camWidth;
+                        Red += Rc[index];
+                        Green += Gc[index];
+                        Blue += Bc[index];
+                    }
+                    ofSetColor(Red/tot,Green/tot,Blue/tot);
+                    ofFill();
+                    ofDrawRectangle(x+X, y+Y, boxWidth, boxHeight);
+                }
+            }
+        }
+    }
+}
+
 void ofxImageTS::pixelate(ofVideoGrabber video, int pixelRatio) {
     ofPixels R,G,B, copy;
     copy.allocate(video.getWidth(), video.getHeight(), OF_PIXELS_RGB);
@@ -449,8 +644,8 @@ void ofxImageTS::update(){
 
 
 //--------------------------------------------------------------
-void ofxImageTS::draw(){
-
+void ofxImageTS::draw(ofPixels pixels,int ratio ,int x, int y, int width, int height,int form){
+    pixelate(pixels,ratio,x,y,width,height,form);
 }
 
 //--------------------------------------------------------------
